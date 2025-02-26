@@ -1,2 +1,1 @@
 # Bankist
- Javascript Project
