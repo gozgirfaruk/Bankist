@@ -62,3 +62,65 @@ tabsContainer.addEventListener('click', function (e) {
         nav.classList.remove('sticky');
     }
   });
+
+  // Sticky nagivation: Intercestion Observer API
+const header = document.querySelector('.header');
+const navHeight = nav.getBoundingClientRect().height;
+
+
+const stickyNav = function(entries){
+  const [ entry]=entries;
+  if(!entry.isIntersecting) nav.classList.add('sticky');
+  else nav.classList.remove('sticky');
+};
+ 
+ const headObserver = new IntersectionObserver(stickyNav,{
+  root: null,
+  threshold: 0,
+  rootMargin: `-${navHeight}px`
+ });
+ headObserver.observe(header);
+
+// Reveal Sections
+const allSections  = document.querySelectorAll('.section');
+
+const revealSection= function(entries,observer){
+  entries.forEach(entry=>{
+    if(!entry.isIntersecting) return;
+    entry.target.classList.remove('section--hidden');
+    observer.unobserve(entry.target);
+  });
+};
+
+const ssectionObserver = new IntersectionObserver(revealSection,{
+  root:null,
+  threshold:0.15
+});
+
+allSections.forEach(function(section){
+  ssectionObserver.observe(section);
+  section.classList.add('section--hidden');
+});
+
+// Lazy loading images
+const imgTargets = document.querySelectorAll('img[data-src]');
+const loadImg = function(entries,observer){
+  const [entry] = entries;
+
+  if(!entry.isIntersecting) return;
+
+  // Raplace src with data-src
+  entry.target.src=entry.target.dataset.src;
+  entry.target.addEventListener('load',function(){
+    entry.target.classList.remove('lazy-img');
+  });
+  observer.unobserve(entry.target);
+};
+
+const imgObserver = new IntersectionObserver(loadImg,{
+  root:null,
+  threshold:0,
+  rootMargin:'-200px'
+});
+
+imgTargets.forEach(img=>imgObserver.observe(img));
